@@ -8,7 +8,6 @@ PIN_NUMBER = 18
 GPIO.setwarnings(False)
 GPIO.setup(PIN_NUMBER, GPIO.OUT)
 
-
 @app.route("/toggle")
 def toggle():
     try:
