@@ -13,18 +13,34 @@ const styles = StyleSheet.create({
   title: {
     // flex: 1
   },
+  temp: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 150
+  },
   switch: {
     marginTop: 80,
     transform: [{ scaleX: 2 }, { scaleY: 2 }]
   }
 })
 
+const wait = (timeout) => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 export const MainScreen = () => {
   // undefined on the beginnig
   const [isEnabled, setIsEnabled] = useState();
   const [switchDisabled, setswitchDisabled] = useState(true)
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
 
   const fetchData = async () => {
+    console.log('aaa')
     try {
       const result = await axios.get(`${URL}/status`);
       setswitchDisabled(false)
@@ -37,7 +53,12 @@ export const MainScreen = () => {
 
 
   useEffect(() => {
-    fetchData();
+    if (refreshing === true)
+      fetchData();
+  }, [refreshing])
+
+  useEffect(() => {
+    fetchData()
   }, [])
 
   const toggleSwitch = async () => {
@@ -55,14 +76,25 @@ export const MainScreen = () => {
 
   return (
     <View style={styles.container}>
-
-      <Title style={styles.title} />
-      <Switch
-        disabled={switchDisabled}
-        style={styles.switch}
-        onValueChange={toggleSwitch}
-        value={isEnabled}
-      />
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
+        <Title style={styles.title} />
+        <View style={styles.temp}>
+          <Switch
+            disabled={switchDisabled}
+            style={styles.switch}
+            onValueChange={toggleSwitch}
+            value={isEnabled}
+          />
+        </View>
+      </ScrollView>
     </View>
   )
 }
