@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Title } from '../components/Title';
-import { View, StyleSheet, Switch } from 'react-native';
+import { View, ToastAndroid, StyleSheet, Switch, ScrollView, RefreshControl } from 'react-native';
 import { URL } from '../utils/config';
 
 const styles = StyleSheet.create({
@@ -22,35 +22,43 @@ const styles = StyleSheet.create({
 export const MainScreen = () => {
   // undefined on the beginnig
   const [isEnabled, setIsEnabled] = useState();
+  const [switchDisabled, setswitchDisabled] = useState(true)
+
+  const fetchData = async () => {
+    try {
+      const result = await axios.get(`${URL}/status`);
+      setswitchDisabled(false)
+      setIsEnabled(result.data.on)
+    } catch (error) {
+      ToastAndroid.show("Błąd sieci. Połącz się z domowym WiFi i odśwież aplikację", ToastAndroid.SHORT);
+      setswitchDisabled(true)
+    }
+  };
+
+
   useEffect(() => {
-    try {
-      const fetchData = async () => {
-        const result = await axios.get(`${URL}/status`);
-        setIsEnabled(result.data.on)
-      }
-      fetchData();
-    }
-    catch (err) {
-      console.log(err)
-    }
+    fetchData();
   }, [])
+
   const toggleSwitch = async () => {
-    try {
-      const fetchData = async () => {
+    const fetchData = async () => {
+      try {
         await axios.get(`${URL}/toggle`);
         setIsEnabled(!isEnabled)
       }
-      fetchData();
+      catch (err) {
+        ToastAndroid.show("Nie udało się przełączyć lampek", ToastAndroid.SHORT);
+      }
     }
-    catch (err) {
-      console.log(err)
-    }
+    fetchData();
   }
 
   return (
     <View style={styles.container}>
+
       <Title style={styles.title} />
       <Switch
+        disabled={switchDisabled}
         style={styles.switch}
         onValueChange={toggleSwitch}
         value={isEnabled}
