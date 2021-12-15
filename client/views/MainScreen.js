@@ -24,10 +24,6 @@ const styles = StyleSheet.create({
   }
 })
 
-const wait = (timeout) => {
-  return new Promise(resolve => setTimeout(resolve, timeout));
-}
-
 export const MainScreen = () => {
   // undefined on the beginnig
   const [isEnabled, setIsEnabled] = useState();
@@ -36,7 +32,7 @@ export const MainScreen = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    wait(2000).then(() => setRefreshing(false));
+    setTimeout(() => setRefreshing(false), 2000)
   }, []);
 
   const fetchData = async () => {
