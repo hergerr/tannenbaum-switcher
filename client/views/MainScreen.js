@@ -40,7 +40,6 @@ export const MainScreen = () => {
   }, []);
 
   const fetchData = async () => {
-    console.log('aaa')
     try {
       const result = await axios.get(`${URL}/status`);
       setswitchDisabled(false)
