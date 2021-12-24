@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve tannenbaum switcher
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/tannenbaum
+Environment="PATH=/home/pi/tannenbaum/venv/bin"
+Restart=always
+RestartSec=3
+ExecStart=/home/pi/tannenbaum/venv/bin/gunicorn --workers 2 --bind localhost:5000 main:app
+
+[Install]
+WantedBy=multi-user.target
